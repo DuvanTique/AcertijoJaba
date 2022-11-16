@@ -2,7 +2,7 @@ package acertijo;
 
 /**
  *
- * @author Duvan
+ * @author DuvanTique
  */
 public class Main {
 

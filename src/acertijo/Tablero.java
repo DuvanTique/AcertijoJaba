@@ -5,27 +5,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import javax.swing.JButton;
 
 /**
  *
- * @author Duvan
+ * @author DuvanTique
  */
 public class Tablero implements ActionListener {
-    //1 = Rojo , 2 = verde , 3 = Amarillo , 4 = Azul , 5 = Morado
+    //0=Blanco , 1 = Rojo , 2 = verde , 3 = Amarillo , 4 = Azul , 5 = Morado
     private final int[][] respuesta = {{1,1,2,3,3},{1,2,2,4,3},{1,2,4,4,3},{1,2,5,5,3},{2,2,5,3,3}};
-    private final int[][] posicionInicial = {{0,1,2,3,0},{0,0,0,4,0},{0,0,4,0,0},{1,0,0,5,0},{2,0,5,3,0}};
+    private int[][] posicionInicial = {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
     private ArrayList<JButton> botones;
     private final int tamañoBoton = 100;
+    private int Puntuacion = 100;
     private int contadorPistas = 0;
     private VistaPrincipal vista;
-
+    
     public Tablero(VistaPrincipal view) {
         this.botones = new ArrayList<>();
         this.vista = view;
+        generarPosicionInicial();
         crearBotones();
         escucharBotones();
         agregarBotones();
+        numerosIniciales();
+        vista.jTextFieldPuntuacion.setText(Puntuacion+"");
         vista.setVisible(true);
         vista.setLocationRelativeTo(null);
     }
@@ -36,7 +41,7 @@ public class Tablero implements ActionListener {
                 JButton bton = new JButton(" ");
                 bton.setBounds(i*tamañoBoton + 50, j*tamañoBoton + 50, tamañoBoton,tamañoBoton);
                 bton.setBackground(selecionarColor(j, i));
-                bton.setForeground(Color.gray);
+                bton.setForeground(Color.BLACK);
                 bton.setActionCommand(respuesta[j][i]+"");
                 bton.setVisible(true);
                 this.botones.add(bton);
@@ -145,12 +150,45 @@ public class Tablero implements ActionListener {
     }
     
     private void agregarPista(){
-        if(contadorPistas < 25){
-            JButton bton = botones.get(contadorPistas);
+        Random r = new Random();
+        if(contadorPistas < 50){
+            JButton bton = botones.get(r.nextInt(25));
             String pista = bton.getActionCommand();
             bton.setText(pista);
             contadorPistas++;
+            Puntuacion -= 2;
         }
+        if(contadorPistas == 10){
+            JButton bton = botones.get(3);
+            bton.setText("Rojo = 1");
+        }
+        else if(contadorPistas == 30){
+            JButton bton = botones.get(10);
+            bton.setText("Verde = 2");            
+        }
+    }
+    
+    private void numerosIniciales(){
+        Random r = new Random();
+            for (int i = 0; i < 8; i++) {
+                JButton bton = botones.get(r.nextInt(25));
+                String pista = bton.getActionCommand();
+                bton.setText(pista);
+            }
+    }
+    
+    private void generarPosicionInicial(){
+        Random r = new Random();
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if(r.nextInt(2) <1){
+                    posicionInicial[j][i]=respuesta[j][i];
+                }
+                else{
+                    posicionInicial[j][i]=0;                    
+                }
+            }
+        }        
     }
     
     @Override
@@ -158,9 +196,11 @@ public class Tablero implements ActionListener {
         if(e.getSource() == vista.jButtonComprobar){
             if(comprobarResultado()){
                 vista.jLabelWin.setText("Ganaste !!!");
+                vista.jButtonComprobar.setVisible(false);
             }
             else{
                 agregarPista();
+                vista.jTextFieldPuntuacion.setText(""+Puntuacion);
             }
         }
         else{
